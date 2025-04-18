@@ -1,7 +1,7 @@
 
 import Layout from '../components/Layout';
 
-const Index = () => {
+const Contacto = () => {
   return (
     <Layout>
       <div className="container mx-auto py-12">
@@ -10,4 +10,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Contacto;
