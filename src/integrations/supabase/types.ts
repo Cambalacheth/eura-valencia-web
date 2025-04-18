@@ -13,8 +13,10 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string | null
+          formatted_content: string | null
           id: string
           image_url: string | null
+          link_url: string | null
           published_at: string | null
           title: string
           updated_at: string | null
@@ -22,8 +24,10 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string | null
+          formatted_content?: string | null
           id?: string
           image_url?: string | null
+          link_url?: string | null
           published_at?: string | null
           title: string
           updated_at?: string | null
@@ -31,8 +35,10 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string | null
+          formatted_content?: string | null
           id?: string
           image_url?: string | null
+          link_url?: string | null
           published_at?: string | null
           title?: string
           updated_at?: string | null

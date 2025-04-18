@@ -4,12 +4,14 @@ import Layout from '../components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import MDEditor from "@uiw/react-md-editor";
 
 interface News {
   id: string;
   title: string;
-  content?: string;
+  formatted_content?: string;
   image_url?: string;
+  link_url?: string;
   published_at: string;
 }
 
@@ -80,11 +82,25 @@ const Noticias = () => {
                   <CardDescription>{formatDate(item.published_at)}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <p>{item.content}</p>
+                  <div data-color-mode="light">
+                    <MDEditor.Markdown 
+                      source={item.formatted_content} 
+                      style={{ backgroundColor: 'transparent', padding: 0 }} 
+                    />
+                  </div>
                 </CardContent>
-                <CardFooter className="border-t pt-4">
-                  <p className="text-sm text-gray-500">EURA Proyectos, Obras y Servicios</p>
-                </CardFooter>
+                {item.link_url && (
+                  <CardFooter>
+                    <a 
+                      href={item.link_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-blue-600 hover:underline"
+                    >
+                      Ver más
+                    </a>
+                  </CardFooter>
+                )}
               </Card>
             ))}
           </div>

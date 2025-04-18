@@ -1,12 +1,15 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Image, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import MDEditor from "@uiw/react-md-editor";
 import {
   Table,
   TableBody,
@@ -24,15 +27,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 interface News {
   id: string;
   title: string;
   content?: string;
+  formatted_content?: string;
   image_url?: string;
+  link_url?: string;
   published_at: string;
   created_at: string;
 }
@@ -47,15 +49,53 @@ const NewsForm = ({
   onCancel: () => void 
 }) => {
   const [title, setTitle] = useState(news?.title || '');
-  const [content, setContent] = useState(news?.content || '');
+  const [content, setContent] = useState(news?.formatted_content || '');
   const [imageUrl, setImageUrl] = useState(news?.image_url || '');
+  const [linkUrl, setLinkUrl] = useState(news?.link_url || '');
+  const { toast } = useToast();
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `news/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('news')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('news')
+        .getPublicUrl(filePath);
+
+      setImageUrl(publicUrl);
+
+      toast({
+        title: 'Imagen subida',
+        description: 'La imagen se ha subido correctamente',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Error al subir la imagen',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       title,
       content,
-      image_url: imageUrl
+      formatted_content: content,
+      image_url: imageUrl,
+      link_url: linkUrl
     });
   };
 
@@ -72,22 +112,52 @@ const NewsForm = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="content">Contenido</Label>
-        <Textarea
-          id="content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={6}
-        />
+        <Label>Contenido</Label>
+        <div data-color-mode="light">
+          <MDEditor
+            value={content}
+            onChange={(val) => setContent(val || '')}
+            height={200}
+          />
+        </div>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="imageUrl">URL de la Imagen</Label>
+        <Label className="flex items-center gap-2">
+          <Image className="w-4 h-4" /> URL de la Imagen
+        </Label>
+        <div className="flex items-center gap-2">
+          <Input
+            id="imageUrl"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="URL de la imagen"
+          />
+          <Input 
+            type="file" 
+            accept="image/*" 
+            className="hidden" 
+            id="imageUpload"
+            onChange={handleImageUpload}
+          />
+          <Label 
+            htmlFor="imageUpload" 
+            className="cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2 inline-flex items-center justify-center rounded-md text-sm font-medium"
+          >
+            Subir
+          </Label>
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label className="flex items-center gap-2">
+          <Link className="w-4 h-4" /> URL del Enlace
+        </Label>
         <Input
-          id="imageUrl"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://ejemplo.com/imagen.jpg"
+          id="linkUrl"
+          value={linkUrl}
+          onChange={(e) => setLinkUrl(e.target.value)}
+          placeholder="https://ejemplo.com"
         />
       </div>
       
