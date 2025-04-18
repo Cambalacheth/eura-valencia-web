@@ -8,6 +8,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index";
 import Nosotros from "./pages/Nosotros";
 import Proyectos from "./pages/Proyectos";
+import Viviendas from "./pages/proyectos/Viviendas";
+import Reformas from "./pages/proyectos/Reformas";
+import Comunidades from "./pages/proyectos/Comunidades";
 import Servicios from "./pages/Servicios";
 import Noticias from "./pages/Noticias";
 import Contacto from "./pages/Contacto";
@@ -25,6 +28,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/proyectos" element={<Proyectos />} />
+          <Route path="/proyectos/viviendas" element={<Viviendas />} />
+          <Route path="/proyectos/reformas" element={<Reformas />} />
+          <Route path="/proyectos/comunidades" element={<Comunidades />} />
           <Route path="/servicios" element={<Servicios />} />
           <Route path="/noticias" element={<Noticias />} />
           <Route path="/contacto" element={<Contacto />} />
