@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Image as ImageIcon, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -136,43 +136,48 @@ const ProjectImageUpload = ({
         description: 'Imagen subida correctamente',
       });
     } catch (error: any) {
+      console.error('Upload error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'Error al subir la imagen',
         variant: 'destructive',
       });
     }
   };
 
   const handleSetCover = async (imageId: string) => {
-    // For new projects, just update local state
-    if (isNewProject) {
-      const updatedImages = images.map(img => ({
-        ...img,
-        is_cover: img.id === imageId
-      }));
-      
-      onImagesChange(updatedImages);
-      
-      toast({
-        title: 'Éxito',
-        description: 'Imagen de portada actualizada',
-      });
-      return;
-    }
-
     try {
+      // For new projects, just update local state
+      if (isNewProject) {
+        const updatedImages = images.map(img => ({
+          ...img,
+          is_cover: img.id === imageId
+        }));
+        
+        onImagesChange(updatedImages);
+        
+        toast({
+          title: 'Éxito',
+          description: 'Imagen de portada actualizada',
+        });
+        return;
+      }
+
       // First, set all images as not cover
-      await supabase
+      const { error: updateAllError } = await supabase
         .from('project_images')
         .update({ is_cover: false })
         .eq('project_id', projectId);
 
+      if (updateAllError) throw updateAllError;
+
       // Then set the selected image as cover
-      await supabase
+      const { error: updateOneError } = await supabase
         .from('project_images')
         .update({ is_cover: true })
         .eq('id', imageId);
+
+      if (updateOneError) throw updateOneError;
 
       // Update local state
       const updatedImages = images.map(img => ({
@@ -187,40 +192,41 @@ const ProjectImageUpload = ({
         description: 'Imagen de portada actualizada',
       });
     } catch (error: any) {
+      console.error('Set cover error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'Error al actualizar la portada',
         variant: 'destructive',
       });
     }
   };
 
   const handleDeleteImage = async (imageId: string) => {
-    // For new projects, just update local state
-    if (isNewProject) {
-      const updatedImages = images.filter(img => img.id !== imageId);
-      
-      // If we removed the cover image, set a new one
-      if (images.find(img => img.id === imageId)?.is_cover && updatedImages.length > 0) {
-        updatedImages[0].is_cover = true;
-      }
-      
-      onImagesChange(updatedImages);
-      
-      toast({
-        title: 'Éxito',
-        description: 'Imagen eliminada correctamente',
-      });
-      return;
-    }
-
     try {
-      const { error } = await supabase
+      // For new projects, just update local state
+      if (isNewProject) {
+        const updatedImages = images.filter(img => img.id !== imageId);
+        
+        // If we removed the cover image, set a new one
+        if (images.find(img => img.id === imageId)?.is_cover && updatedImages.length > 0) {
+          updatedImages[0].is_cover = true;
+        }
+        
+        onImagesChange(updatedImages);
+        
+        toast({
+          title: 'Éxito',
+          description: 'Imagen eliminada correctamente',
+        });
+        return;
+      }
+
+      const { error: deleteError } = await supabase
         .from('project_images')
         .delete()
         .eq('id', imageId);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
 
       const updatedImages = images.filter(img => img.id !== imageId);
       
@@ -230,10 +236,12 @@ const ProjectImageUpload = ({
       if (wasRemovingCoverImage && updatedImages.length > 0) {
         // Set a new cover image
         const newCoverId = updatedImages[0].id;
-        await supabase
+        const { error: updateError } = await supabase
           .from('project_images')
           .update({ is_cover: true })
           .eq('id', newCoverId);
+          
+        if (updateError) throw updateError;
           
         // Update the local state
         updatedImages[0].is_cover = true;
@@ -246,9 +254,10 @@ const ProjectImageUpload = ({
         description: 'Imagen eliminada correctamente',
       });
     } catch (error: any) {
+      console.error('Delete error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'Error al eliminar la imagen',
         variant: 'destructive',
       });
     }
@@ -264,22 +273,29 @@ const ProjectImageUpload = ({
               alt="Imagen del proyecto" 
               className="w-full h-48 object-cover rounded-lg"
             />
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
               <Button
                 variant={image.is_cover ? "default" : "secondary"}
                 size="sm"
                 onClick={() => handleSetCover(image.id)}
+                className="w-full"
               >
-                {image.is_cover ? 'Portada' : 'Hacer portada'}
+                {image.is_cover ? 'Portada ✓' : 'Hacer portada'}
               </Button>
               <Button
                 variant="destructive"
                 size="sm"
                 onClick={() => handleDeleteImage(image.id)}
+                className="w-full"
               >
                 Eliminar
               </Button>
             </div>
+            {image.is_cover && (
+              <div className="absolute top-2 right-2 bg-primary text-white text-xs px-2 py-1 rounded-full">
+                Portada
+              </div>
+            )}
           </div>
         ))}
         <div 

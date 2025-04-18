@@ -52,30 +52,39 @@ const ProjectForm = ({
   const [construction, setConstruction] = useState(project?.construction || '');
   const [completion, setCompletion] = useState(project?.completion || '');
   const [projectImages, setProjectImages] = useState<ProjectImage[]>([]);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   
   // Generate a temporary ID for new projects to use with image uploads
   const [tempProjectId] = useState(`temp-${Math.random().toString(36).substr(2, 9)}`);
 
+  // Fetch images when editing an existing project
   useEffect(() => {
     if (project) {
       const fetchImages = async () => {
-        const { data, error } = await supabase
-          .from('project_images')
-          .select('*')
-          .eq('project_id', project.id);
+        setLoading(true);
+        try {
+          const { data, error } = await supabase
+            .from('project_images')
+            .select('*')
+            .eq('project_id', project.id);
 
-        if (error) {
+          if (error) {
+            throw error;
+          }
+
+          setProjectImages(data || []);
+          if (onImagesChange) onImagesChange(data || []);
+        } catch (error: any) {
+          console.error('Error fetching images:', error);
           toast({
             title: 'Error',
             description: 'No se pudieron cargar las imágenes',
             variant: 'destructive',
           });
-          return;
+        } finally {
+          setLoading(false);
         }
-
-        setProjectImages(data);
-        if (onImagesChange) onImagesChange(data);
       };
 
       fetchImages();
@@ -122,6 +131,7 @@ const ProjectForm = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            placeholder="Nombre del proyecto"
           />
         </div>
         
@@ -131,7 +141,7 @@ const ProjectForm = ({
             value={category}
             onValueChange={(value) => setCategory(value)}
           >
-            <SelectTrigger>
+            <SelectTrigger id="category">
               <SelectValue placeholder="Selecciona una categoría" />
             </SelectTrigger>
             <SelectContent>
@@ -148,6 +158,7 @@ const ProjectForm = ({
             id="location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            placeholder="Localización del proyecto"
           />
         </div>
         
@@ -158,6 +169,7 @@ const ProjectForm = ({
             value={projectDesc}
             onChange={(e) => setProjectDesc(e.target.value)}
             rows={4}
+            placeholder="Descripción del proyecto"
           />
         </div>
         
@@ -167,6 +179,7 @@ const ProjectForm = ({
             id="construction"
             value={construction}
             onChange={(e) => setConstruction(e.target.value)}
+            placeholder="Detalles de construcción"
           />
         </div>
         
@@ -176,17 +189,22 @@ const ProjectForm = ({
             id="completion"
             value={completion}
             onChange={(e) => setCompletion(e.target.value)}
+            placeholder="Fecha o año de finalización"
           />
         </div>
 
-        <div className="space-y-4">
-          <Label>Imágenes del Proyecto</Label>
-          <ProjectImageUpload 
-            projectId={project ? project.id : tempProjectId} 
-            images={projectImages} 
-            onImagesChange={handleImagesChange} 
-            isNewProject={!project}
-          />
+        <div className="space-y-4 pt-4">
+          <Label className="text-lg font-medium">Imágenes del Proyecto</Label>
+          {loading ? (
+            <div className="text-center py-8">Cargando imágenes...</div>
+          ) : (
+            <ProjectImageUpload 
+              projectId={project ? project.id : tempProjectId}
+              images={projectImages}
+              onImagesChange={handleImagesChange}
+              isNewProject={!project}
+            />
+          )}
         </div>
       </div>
       

@@ -53,6 +53,7 @@ const ProyectosAdmin = () => {
   // Fetch projects and their images
   useEffect(() => {
     const fetchProjects = async () => {
+      setLoading(true);
       try {
         const { data: projectsData, error: projectsError } = await supabase
           .from('projects')
@@ -79,9 +80,10 @@ const ProyectosAdmin = () => {
         setProjects(projectsData || []);
         setProjectImages(imagesByProject);
       } catch (error: any) {
+        console.error('Error fetching projects:', error);
         toast({
           title: 'Error',
-          description: error.message,
+          description: error.message || 'Error al cargar los proyectos',
           variant: 'destructive',
         });
       } finally {
@@ -107,6 +109,8 @@ const ProyectosAdmin = () => {
       
       // If we have temporary images, save them to the database
       if (tempImages && tempImages.length > 0) {
+        console.log('Processing temporary images:', tempImages);
+        
         // Map the temporary images to the new project
         const projectImagesData = tempImages.map(img => ({
           project_id: data.id,
@@ -115,9 +119,10 @@ const ProyectosAdmin = () => {
         }));
         
         // Insert all images at once
-        const { error: imageError } = await supabase
+        const { error: imageError, data: savedImages } = await supabase
           .from('project_images')
-          .insert(projectImagesData);
+          .insert(projectImagesData)
+          .select();
           
         if (imageError) {
           console.error('Error saving images:', imageError);
@@ -126,16 +131,15 @@ const ProyectosAdmin = () => {
             description: 'Proyecto creado, pero hubo un problema al guardar algunas imágenes',
             variant: 'destructive',
           });
+        } else {
+          console.log('Images saved successfully:', savedImages);
+          
+          // Update local state with the saved images
+          setProjectImages(prev => ({
+            ...prev,
+            [data.id]: savedImages
+          }));
         }
-        
-        // Update local state
-        setProjectImages(prev => ({
-          ...prev,
-          [data.id]: projectImagesData.map((img, idx) => ({
-            ...img,
-            id: `temp-${idx}` // We don't have real IDs yet, but will refresh on next load
-          }))
-        }));
       }
       
       setProjects((prev) => [data, ...prev]);
@@ -146,9 +150,10 @@ const ProyectosAdmin = () => {
         description: 'Proyecto creado correctamente',
       });
     } catch (error: any) {
+      console.error('Create project error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'Error al crear el proyecto',
         variant: 'destructive',
       });
     }
@@ -177,29 +182,39 @@ const ProyectosAdmin = () => {
         description: 'Proyecto actualizado correctamente',
       });
     } catch (error: any) {
+      console.error('Update project error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'Error al actualizar el proyecto',
         variant: 'destructive',
       });
     }
   };
 
   const handleDeleteProject = async (projectId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.')) {
+      return;
+    }
+    
     try {
       // Delete all project images first
-      await supabase
+      const { error: imageDeleteError } = await supabase
         .from('project_images')
         .delete()
         .eq('project_id', projectId);
       
+      if (imageDeleteError) {
+        console.error('Error deleting images:', imageDeleteError);
+        // Continue with project deletion even if image deletion fails
+      }
+      
       // Then delete the project
-      const { error } = await supabase
+      const { error: projectDeleteError } = await supabase
         .from('projects')
         .delete()
         .eq('id', projectId);
       
-      if (error) throw error;
+      if (projectDeleteError) throw projectDeleteError;
       
       setProjects((prev) => prev.filter((p) => p.id !== projectId));
       
@@ -208,9 +223,10 @@ const ProyectosAdmin = () => {
         description: 'Proyecto eliminado correctamente',
       });
     } catch (error: any) {
+      console.error('Delete project error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'Error al eliminar el proyecto',
         variant: 'destructive',
       });
     }
