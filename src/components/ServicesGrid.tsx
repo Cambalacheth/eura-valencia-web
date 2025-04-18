@@ -38,10 +38,16 @@ const services = [
 
 const ServicesGrid = () => {
   return (
-    <Carousel className="w-full max-w-5xl mx-auto">
-      <CarouselContent>
+    <Carousel 
+      opts={{
+        align: "start",
+        slidesToScroll: 3,
+      }}
+      className="w-full max-w-5xl mx-auto"
+    >
+      <CarouselContent className="-ml-4">
         {services.map((service, index) => (
-          <CarouselItem key={index}>
+          <CarouselItem key={index} className="basis-1/3 pl-4">
             <ServiceCard
               title={service.title}
               description={service.description}
