@@ -1,11 +1,11 @@
 
 import Layout from '../components/Layout';
+import About from '../components/About';
 
 const Nosotros = () => {
   return (
     <Layout>
-      <div className="container mx-auto py-12">
-      </div>
+      <About />
     </Layout>
   );
 };

@@ -1,11 +1,15 @@
 
 import Layout from '../components/Layout';
+import Hero from '../components/Hero';
+import ServiceImages from '../components/ServiceImages';
+import About from '../components/About';
 
 const Index = () => {
   return (
     <Layout>
-      <div className="container mx-auto py-12">
-      </div>
+      <Hero />
+      <ServiceImages />
+      <About />
     </Layout>
   );
 };
