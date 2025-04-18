@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Instagram } from 'lucide-react';
+import { Instagram, Settings } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
@@ -17,7 +17,12 @@ const Navbar = () => {
         <Link to="/noticias" className="hover:underline underline-offset-8 decoration-2">Noticias</Link>
         <Link to="/contacto" className="hover:underline underline-offset-8 decoration-2">Contacto</Link>
         {isAdmin && (
-          <Link to="/admin" className="hover:underline underline-offset-8 decoration-2">Admin</Link>
+          <>
+            <Link to="/administracion" className="flex items-center gap-1 hover:underline underline-offset-8 decoration-2">
+              <Settings className="w-4 h-4" />
+              Administración
+            </Link>
+          </>
         )}
         <a href="https://www.instagram.com/euraproyectosobrasyservicios" target="_blank" rel="noopener noreferrer">
           <Instagram className="w-5 h-5" />

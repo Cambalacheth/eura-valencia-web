@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
@@ -16,14 +17,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user?.email === 'EuraAdmin') {
+      if (session?.user?.email === 'mail@eura.es') {
         setIsAdmin(true);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user?.email === 'EuraAdmin') {
+      if (session?.user?.email === 'mail@eura.es') {
         setIsAdmin(true);
       } else {
         setIsAdmin(false);
