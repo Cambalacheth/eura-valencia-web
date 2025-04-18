@@ -7,8 +7,8 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ title, description, image }: ServiceCardProps) => {
   return (
-    <div className="group relative overflow-hidden">
-      <div className="relative h-96">
+    <div className="group relative overflow-hidden mx-auto max-w-4xl">
+      <div className="relative h-[400px]">
         <img
           src={image}
           alt={title}
