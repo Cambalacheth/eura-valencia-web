@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase, VALID_PROJECT_CATEGORIES } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -23,6 +24,7 @@ interface Project {
   project?: string;
   construction?: string;
   completion?: string;
+  website?: string;
 }
 
 interface ProjectImage {
@@ -46,10 +48,11 @@ const ProjectForm = ({
 }: ProjectFormProps) => {
   const [title, setTitle] = useState(project?.title || '');
   const [category, setCategory] = useState(project?.category || VALID_PROJECT_CATEGORIES[0]);
+  const [construction, setConstruction] = useState(project?.construction || '');
   const [location, setLocation] = useState(project?.location || '');
   const [projectDesc, setProjectDesc] = useState(project?.project || '');
-  const [construction, setConstruction] = useState(project?.construction || '');
   const [completion, setCompletion] = useState(project?.completion || '');
+  const [website, setWebsite] = useState(project?.website || '');
   const [projectImages, setProjectImages] = useState<ProjectImage[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -100,23 +103,34 @@ const ProjectForm = ({
       return;
     }
     
+    if (!title) {
+      toast({
+        title: 'Error',
+        description: 'El nombre del proyecto es obligatorio.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     if (!project && projectImages.length > 0) {
       onSubmit({
         title,
         category,
+        construction,
         location,
         project: projectDesc,
-        construction,
-        completion
+        completion,
+        website
       }, projectImages);
     } else {
       onSubmit({
         title,
         category,
+        construction,
         location,
         project: projectDesc,
-        construction,
-        completion
+        completion,
+        website
       });
     }
   };
@@ -130,12 +144,11 @@ const ProjectForm = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="title">Título</Label>
+          <Label htmlFor="title">Nombre</Label>
           <Input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
             placeholder="Nombre del proyecto"
           />
         </div>
@@ -145,7 +158,6 @@ const ProjectForm = ({
           <Select
             value={category}
             onValueChange={(value) => setCategory(value)}
-            required
           >
             <SelectTrigger id="category">
               <SelectValue placeholder="Selecciona una categoría" />
@@ -163,27 +175,6 @@ const ProjectForm = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="location">Ubicación</Label>
-          <Input
-            id="location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="Localización del proyecto"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="projectDesc">Descripción del Proyecto</Label>
-          <Textarea
-            id="projectDesc"
-            value={projectDesc}
-            onChange={(e) => setProjectDesc(e.target.value)}
-            rows={4}
-            placeholder="Descripción del proyecto"
-          />
-        </div>
-        
-        <div className="space-y-2">
           <Label htmlFor="construction">Construcción</Label>
           <Input
             id="construction"
@@ -194,12 +185,43 @@ const ProjectForm = ({
         </div>
         
         <div className="space-y-2">
+          <Label htmlFor="location">Ubicación</Label>
+          <Input
+            id="location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Localización del proyecto"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="projectDesc">Proyecto</Label>
+          <Textarea
+            id="projectDesc"
+            value={projectDesc}
+            onChange={(e) => setProjectDesc(e.target.value)}
+            rows={4}
+            placeholder="Descripción del proyecto"
+          />
+        </div>
+        
+        <div className="space-y-2">
           <Label htmlFor="completion">Finalización</Label>
           <Input
             id="completion"
             value={completion}
             onChange={(e) => setCompletion(e.target.value)}
             placeholder="Fecha o año de finalización"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="website">Website</Label>
+          <Input
+            id="website"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            placeholder="URL del proyecto (opcional)"
           />
         </div>
 
@@ -231,3 +253,4 @@ const ProjectForm = ({
 };
 
 export default ProjectForm;
+
