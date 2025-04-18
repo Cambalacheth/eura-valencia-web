@@ -34,7 +34,7 @@ interface ProjectImage {
 
 interface ProjectFormProps {
   project?: Project;
-  onSubmit: (data: Omit<Project, 'id'>) => void;
+  onSubmit: (data: Omit<Project, 'id'>, tempImages?: ProjectImage[]) => void;
   onCancel: () => void;
   onImagesChange?: (images: ProjectImage[]) => void;
 }
@@ -53,6 +53,9 @@ const ProjectForm = ({
   const [completion, setCompletion] = useState(project?.completion || '');
   const [projectImages, setProjectImages] = useState<ProjectImage[]>([]);
   const { toast } = useToast();
+  
+  // Generate a temporary ID for new projects to use with image uploads
+  const [tempProjectId] = useState(`temp-${Math.random().toString(36).substr(2, 9)}`);
 
   useEffect(() => {
     if (project) {
@@ -81,14 +84,27 @@ const ProjectForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      title,
-      category,
-      location,
-      project: projectDesc,
-      construction,
-      completion
-    });
+    
+    // If this is a new project and we have temporary images, pass them along
+    if (!project && projectImages.length > 0) {
+      onSubmit({
+        title,
+        category,
+        location,
+        project: projectDesc,
+        construction,
+        completion
+      }, projectImages);
+    } else {
+      onSubmit({
+        title,
+        category,
+        location,
+        project: projectDesc,
+        construction,
+        completion
+      });
+    }
   };
 
   const handleImagesChange = (images: ProjectImage[]) => {
@@ -163,16 +179,15 @@ const ProjectForm = ({
           />
         </div>
 
-        {project && (
-          <div className="space-y-4">
-            <Label>Imágenes del Proyecto</Label>
-            <ProjectImageUpload 
-              projectId={project.id} 
-              images={projectImages} 
-              onImagesChange={handleImagesChange} 
-            />
-          </div>
-        )}
+        <div className="space-y-4">
+          <Label>Imágenes del Proyecto</Label>
+          <ProjectImageUpload 
+            projectId={project ? project.id : tempProjectId} 
+            images={projectImages} 
+            onImagesChange={handleImagesChange} 
+            isNewProject={!project}
+          />
+        </div>
       </div>
       
       <DialogFooter>

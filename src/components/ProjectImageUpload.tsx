@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Image as ImageIcon } from 'lucide-react';
+import { Image as ImageIcon, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,16 +15,91 @@ interface ProjectImageUploadProps {
   projectId: string;
   images: ProjectImage[];
   onImagesChange: (images: ProjectImage[]) => void;
+  isNewProject?: boolean;
 }
 
-const ProjectImageUpload = ({ projectId, images, onImagesChange }: ProjectImageUploadProps) => {
+const ProjectImageUpload = ({ 
+  projectId, 
+  images, 
+  onImagesChange, 
+  isNewProject = false 
+}: ProjectImageUploadProps) => {
   const { toast } = useToast();
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Handle file drag events
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleImageUpload(e.dataTransfer.files);
+    }
+  };
 
   const handleImageUpload = async (files: FileList) => {
     const file = files[0];
     if (!file || !projectId) return;
 
     try {
+      // For new projects, we'll store the image temporarily and associate it when the project is created
+      if (isNewProject) {
+        // Create a unique file path
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        // Upload to storage
+        const { error: uploadError } = await supabase.storage
+          .from('projects')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // Get the public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('projects')
+          .getPublicUrl(filePath);
+
+        // Create a temporary image object for the UI
+        const tempImage = {
+          id: fileName, // Using the filename as temporary ID
+          image_url: publicUrl,
+          is_cover: images.length === 0
+        };
+
+        // Update local state
+        const updatedImages = [...images, tempImage];
+        onImagesChange(updatedImages);
+
+        toast({
+          title: 'Éxito',
+          description: 'Imagen subida correctamente. Se guardará cuando cree el proyecto.',
+        });
+
+        return;
+      }
+
+      // Regular upload for existing projects
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `${fileName}`;
@@ -70,6 +145,22 @@ const ProjectImageUpload = ({ projectId, images, onImagesChange }: ProjectImageU
   };
 
   const handleSetCover = async (imageId: string) => {
+    // For new projects, just update local state
+    if (isNewProject) {
+      const updatedImages = images.map(img => ({
+        ...img,
+        is_cover: img.id === imageId
+      }));
+      
+      onImagesChange(updatedImages);
+      
+      toast({
+        title: 'Éxito',
+        description: 'Imagen de portada actualizada',
+      });
+      return;
+    }
+
     try {
       // First, set all images as not cover
       await supabase
@@ -105,6 +196,24 @@ const ProjectImageUpload = ({ projectId, images, onImagesChange }: ProjectImageU
   };
 
   const handleDeleteImage = async (imageId: string) => {
+    // For new projects, just update local state
+    if (isNewProject) {
+      const updatedImages = images.filter(img => img.id !== imageId);
+      
+      // If we removed the cover image, set a new one
+      if (images.find(img => img.id === imageId)?.is_cover && updatedImages.length > 0) {
+        updatedImages[0].is_cover = true;
+      }
+      
+      onImagesChange(updatedImages);
+      
+      toast({
+        title: 'Éxito',
+        description: 'Imagen eliminada correctamente',
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('project_images')
@@ -114,6 +223,22 @@ const ProjectImageUpload = ({ projectId, images, onImagesChange }: ProjectImageU
       if (error) throw error;
 
       const updatedImages = images.filter(img => img.id !== imageId);
+      
+      // If we removed the cover image, set a new one if available
+      const wasRemovingCoverImage = images.find(img => img.id === imageId)?.is_cover;
+      
+      if (wasRemovingCoverImage && updatedImages.length > 0) {
+        // Set a new cover image
+        const newCoverId = updatedImages[0].id;
+        await supabase
+          .from('project_images')
+          .update({ is_cover: true })
+          .eq('id', newCoverId);
+          
+        // Update the local state
+        updatedImages[0].is_cover = true;
+      }
+      
       onImagesChange(updatedImages);
 
       toast({
@@ -157,10 +282,18 @@ const ProjectImageUpload = ({ projectId, images, onImagesChange }: ProjectImageU
             </div>
           </div>
         ))}
-        <div className="flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg">
+        <div 
+          className={`flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg ${isDragging ? 'border-primary bg-primary/10' : 'border-gray-300'}`}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
           <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
-            <ImageIcon className="w-8 h-8 text-gray-400" />
-            <span className="mt-2 text-sm text-gray-500">Agregar imagen</span>
+            <Upload className="w-8 h-8 text-gray-400" />
+            <span className="mt-2 text-sm text-gray-500">
+              {isDragging ? 'Soltar aquí' : 'Agregar imagen (o arrastrar aquí)'}
+            </span>
             <input
               type="file"
               className="hidden"

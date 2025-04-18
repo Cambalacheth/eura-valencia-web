@@ -92,7 +92,10 @@ const ProyectosAdmin = () => {
     fetchProjects();
   }, [toast]);
 
-  const handleCreateProject = async (projectData: Omit<Project, 'id'>) => {
+  const handleCreateProject = async (
+    projectData: Omit<Project, 'id'>, 
+    tempImages?: ProjectImage[]
+  ) => {
     try {
       const { data, error } = await supabase
         .from('projects')
@@ -101,6 +104,39 @@ const ProyectosAdmin = () => {
         .single();
       
       if (error) throw error;
+      
+      // If we have temporary images, save them to the database
+      if (tempImages && tempImages.length > 0) {
+        // Map the temporary images to the new project
+        const projectImagesData = tempImages.map(img => ({
+          project_id: data.id,
+          image_url: img.image_url,
+          is_cover: img.is_cover
+        }));
+        
+        // Insert all images at once
+        const { error: imageError } = await supabase
+          .from('project_images')
+          .insert(projectImagesData);
+          
+        if (imageError) {
+          console.error('Error saving images:', imageError);
+          toast({
+            title: 'Advertencia',
+            description: 'Proyecto creado, pero hubo un problema al guardar algunas imágenes',
+            variant: 'destructive',
+          });
+        }
+        
+        // Update local state
+        setProjectImages(prev => ({
+          ...prev,
+          [data.id]: projectImagesData.map((img, idx) => ({
+            ...img,
+            id: `temp-${idx}` // We don't have real IDs yet, but will refresh on next load
+          }))
+        }));
+      }
       
       setProjects((prev) => [data, ...prev]);
       setIsCreating(false);
