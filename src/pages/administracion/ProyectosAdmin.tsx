@@ -5,7 +5,7 @@ import Layout from '../../components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -15,15 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import ProjectForm from '@/components/ProjectForm';
 
 interface Project {
@@ -48,10 +39,8 @@ const ProyectosAdmin = () => {
   const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [openDialog, setOpenDialog] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [currentProject, setCurrentProject] = useState<Project | undefined>(undefined);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [projectImages, setProjectImages] = useState<Record<string, ProjectImage[]>>({});
 
   // Redirect if not admin
@@ -114,7 +103,7 @@ const ProyectosAdmin = () => {
       if (error) throw error;
       
       setProjects((prev) => [data, ...prev]);
-      setOpenDialog(false);
+      setIsCreating(false);
       
       toast({
         title: 'Éxito',
@@ -145,7 +134,6 @@ const ProyectosAdmin = () => {
       setProjects((prev) => 
         prev.map((p) => (p.id === currentProject.id ? data : p))
       );
-      setOpenDialog(false);
       setCurrentProject(undefined);
       
       toast({
@@ -161,27 +149,23 @@ const ProyectosAdmin = () => {
     }
   };
 
-  const handleDeleteProject = async () => {
-    if (!projectToDelete) return;
-    
+  const handleDeleteProject = async (projectId: string) => {
     try {
-      // Delete all project images
+      // Delete all project images first
       await supabase
         .from('project_images')
         .delete()
-        .eq('project_id', projectToDelete);
+        .eq('project_id', projectId);
       
-      // Delete the project
+      // Then delete the project
       const { error } = await supabase
         .from('projects')
         .delete()
-        .eq('id', projectToDelete);
+        .eq('id', projectId);
       
       if (error) throw error;
       
-      setProjects((prev) => prev.filter((p) => p.id !== projectToDelete));
-      setDeleteConfirmOpen(false);
-      setProjectToDelete(null);
+      setProjects((prev) => prev.filter((p) => p.id !== projectId));
       
       toast({
         title: 'Éxito',
@@ -212,42 +196,54 @@ const ProyectosAdmin = () => {
     }
   };
 
+  if (isCreating || currentProject) {
+    return (
+      <Layout>
+        <div className="container mx-auto py-12 px-4">
+          <div className="mb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                setIsCreating(false);
+                setCurrentProject(undefined);
+              }}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Volver a la lista
+            </Button>
+          </div>
+          
+          <div className="mb-8">
+            <h1 className="text-4xl font-light">
+              {isCreating ? "Crear Nuevo Proyecto" : "Editar Proyecto"}
+            </h1>
+          </div>
+
+          <ProjectForm 
+            project={currentProject}
+            onSubmit={isCreating ? handleCreateProject : handleUpdateProject}
+            onCancel={() => {
+              setIsCreating(false);
+              setCurrentProject(undefined);
+            }}
+            onImagesChange={currentProject 
+              ? (images) => handleImagesChange(currentProject.id, images) 
+              : undefined}
+          />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="container mx-auto py-12 px-4">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-light">Gestión de Proyectos</h1>
-          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
-                <PlusCircle className="w-4 h-4" />
-                Nuevo Proyecto
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
-                <DialogTitle>
-                  {currentProject ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}
-                </DialogTitle>
-                <DialogDescription>
-                  {currentProject 
-                    ? 'Modifica los detalles del proyecto existente.' 
-                    : 'Añade un nuevo proyecto al sitio web.'}
-                </DialogDescription>
-              </DialogHeader>
-              <ProjectForm 
-                project={currentProject} 
-                onSubmit={currentProject ? handleUpdateProject : handleCreateProject}
-                onCancel={() => {
-                  setOpenDialog(false);
-                  setCurrentProject(undefined);
-                }}
-                onImagesChange={currentProject 
-                  ? (images) => handleImagesChange(currentProject.id, images) 
-                  : undefined}
-              />
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => setIsCreating(true)}>
+            Nuevo Proyecto
+          </Button>
         </div>
 
         {loading ? (
@@ -278,23 +274,15 @@ const ProyectosAdmin = () => {
                     <div className="flex justify-end gap-2">
                       <Button 
                         variant="outline" 
-                        size="icon"
-                        onClick={() => {
-                          setCurrentProject(project);
-                          setOpenDialog(true);
-                        }}
+                        onClick={() => setCurrentProject(project)}
                       >
-                        <Edit className="h-4 w-4" />
+                        Editar
                       </Button>
                       <Button 
-                        variant="outline" 
-                        size="icon"
-                        onClick={() => {
-                          setProjectToDelete(project.id);
-                          setDeleteConfirmOpen(true);
-                        }}
+                        variant="destructive"
+                        onClick={() => handleDeleteProject(project.id)}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        Eliminar
                       </Button>
                     </div>
                   </TableCell>
@@ -304,26 +292,6 @@ const ProyectosAdmin = () => {
           </Table>
         )}
       </div>
-
-      {/* Delete confirmation dialog */}
-      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Confirmar eliminación</DialogTitle>
-            <DialogDescription>
-              ¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteProject}>
-              Eliminar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </Layout>
   );
 };
