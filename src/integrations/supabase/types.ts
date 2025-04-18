@@ -9,27 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      admin_users: {
-        Row: {
-          created_at: string | null
-          email: string
-          id: string
-          is_admin: boolean | null
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          id: string
-          is_admin?: boolean | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          id?: string
-          is_admin?: boolean | null
-        }
-        Relationships: []
-      }
       news: {
         Row: {
           content: string | null
@@ -133,7 +112,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
+      is_authenticated_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }

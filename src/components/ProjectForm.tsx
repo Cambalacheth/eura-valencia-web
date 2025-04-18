@@ -39,6 +39,9 @@ interface ProjectFormProps {
   onImagesChange?: (images: ProjectImage[]) => void;
 }
 
+// Definimos las categorías exactamente como están en la base de datos
+const VALID_CATEGORIES = ['viviendas', 'reformas', 'comunidades'];
+
 const ProjectForm = ({
   project,
   onSubmit,
@@ -46,7 +49,7 @@ const ProjectForm = ({
   onImagesChange
 }: ProjectFormProps) => {
   const [title, setTitle] = useState(project?.title || '');
-  const [category, setCategory] = useState(project?.category || 'viviendas');
+  const [category, setCategory] = useState(project?.category || VALID_CATEGORIES[0]);
   const [location, setLocation] = useState(project?.location || '');
   const [projectDesc, setProjectDesc] = useState(project?.project || '');
   const [construction, setConstruction] = useState(project?.construction || '');
@@ -94,6 +97,16 @@ const ProjectForm = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validar que la categoría sea una de las permitidas
+    if (!VALID_CATEGORIES.includes(category)) {
+      toast({
+        title: 'Error',
+        description: 'Categoría no válida. Seleccione una de las opciones disponibles.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     // If this is a new project and we have temporary images, pass them along
     if (!project && projectImages.length > 0) {
       onSubmit({
@@ -120,6 +133,9 @@ const ProjectForm = ({
     setProjectImages(images);
     if (onImagesChange) onImagesChange(images);
   };
+  
+  // Debug para verificar el valor de la categoría
+  console.log('Current category value:', category);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -140,14 +156,19 @@ const ProjectForm = ({
           <Select
             value={category}
             onValueChange={(value) => setCategory(value)}
+            required
           >
             <SelectTrigger id="category">
               <SelectValue placeholder="Selecciona una categoría" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="viviendas">Viviendas</SelectItem>
-              <SelectItem value="reformas">Reformas</SelectItem>
-              <SelectItem value="comunidades">Comunidades</SelectItem>
+              {VALID_CATEGORIES.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {cat === 'viviendas' ? 'Viviendas' : 
+                   cat === 'reformas' ? 'Reformas' : 
+                   cat === 'comunidades' ? 'Comunidades' : cat}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

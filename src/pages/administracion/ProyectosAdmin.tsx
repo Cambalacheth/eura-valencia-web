@@ -33,6 +33,9 @@ interface ProjectImage {
   is_cover: boolean;
 }
 
+// Definimos las categorías válidas para mantener consistencia
+const VALID_CATEGORIES = ['viviendas', 'reformas', 'comunidades'];
+
 const ProyectosAdmin = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -99,13 +102,28 @@ const ProyectosAdmin = () => {
     tempImages?: ProjectImage[]
   ) => {
     try {
+      // Validar que la categoría sea válida
+      if (!VALID_CATEGORIES.includes(projectData.category)) {
+        toast({
+          title: 'Error',
+          description: 'Categoría no válida. Debe ser una de: viviendas, reformas, comunidades',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      console.log('Submitting project with category:', projectData.category);
+      
       const { data, error } = await supabase
         .from('projects')
         .insert([projectData])
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Insert error details:', error);
+        throw error;
+      }
       
       // If we have temporary images, save them to the database
       if (tempImages && tempImages.length > 0) {
