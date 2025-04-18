@@ -19,7 +19,7 @@ const Navbar = () => {
         {isAdmin && (
           <Link to="/admin" className="hover:underline underline-offset-8 decoration-2">Admin</Link>
         )}
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+        <a href="https://www.instagram.com/euraproyectosobrasyservicios" target="_blank" rel="noopener noreferrer">
           <Instagram className="w-5 h-5" />
         </a>
       </div>

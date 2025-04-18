@@ -16,25 +16,17 @@ const Admin = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Check if credentials match the admin user
+      if (email !== 'mail@eura.es' || password !== 'EuraAdmin') {
+        throw new Error('Invalid credentials');
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
-
-      // Check if user is admin
-      const { data: adminUser, error: adminError } = await supabase
-        .from('admin_users')
-        .select('is_admin')
-        .eq('email', email)
-        .single();
-
-      if (adminError) throw adminError;
-
-      if (!adminUser?.is_admin) {
-        throw new Error('Unauthorized access');
-      }
 
       toast({
         title: "Login Successful",
