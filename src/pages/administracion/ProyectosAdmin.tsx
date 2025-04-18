@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, VALID_PROJECT_CATEGORIES } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,9 +32,6 @@ interface ProjectImage {
   is_cover: boolean;
 }
 
-// Definimos las categorías válidas para mantener consistencia
-const VALID_CATEGORIES = ['viviendas', 'reformas', 'comunidades'];
-
 const ProyectosAdmin = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -46,14 +42,12 @@ const ProyectosAdmin = () => {
   const [currentProject, setCurrentProject] = useState<Project | undefined>(undefined);
   const [projectImages, setProjectImages] = useState<Record<string, ProjectImage[]>>({});
 
-  // Redirect if not admin
   useEffect(() => {
     if (!isAdmin) {
       navigate('/');
     }
   }, [isAdmin, navigate]);
 
-  // Fetch projects and their images
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
@@ -71,7 +65,6 @@ const ProyectosAdmin = () => {
         
         if (imagesError) throw imagesError;
         
-        // Group images by project_id
         const imagesByProject = imagesData.reduce((acc: Record<string, ProjectImage[]>, img) => {
           if (!acc[img.project_id]) {
             acc[img.project_id] = [];
@@ -102,8 +95,7 @@ const ProyectosAdmin = () => {
     tempImages?: ProjectImage[]
   ) => {
     try {
-      // Validar que la categoría sea válida
-      if (!VALID_CATEGORIES.includes(projectData.category)) {
+      if (!VALID_PROJECT_CATEGORIES.includes(projectData.category as any)) {
         toast({
           title: 'Error',
           description: 'Categoría no válida. Debe ser una de: viviendas, reformas, comunidades',
@@ -111,8 +103,6 @@ const ProyectosAdmin = () => {
         });
         return;
       }
-      
-      console.log('Submitting project with category:', projectData.category);
       
       const { data, error } = await supabase
         .from('projects')
@@ -125,18 +115,15 @@ const ProyectosAdmin = () => {
         throw error;
       }
       
-      // If we have temporary images, save them to the database
       if (tempImages && tempImages.length > 0) {
         console.log('Processing temporary images:', tempImages);
         
-        // Map the temporary images to the new project
         const projectImagesData = tempImages.map(img => ({
           project_id: data.id,
           image_url: img.image_url,
           is_cover: img.is_cover
         }));
         
-        // Insert all images at once
         const { error: imageError, data: savedImages } = await supabase
           .from('project_images')
           .insert(projectImagesData)
@@ -152,7 +139,6 @@ const ProyectosAdmin = () => {
         } else {
           console.log('Images saved successfully:', savedImages);
           
-          // Update local state with the saved images
           setProjectImages(prev => ({
             ...prev,
             [data.id]: savedImages
@@ -215,7 +201,6 @@ const ProyectosAdmin = () => {
     }
     
     try {
-      // Delete all project images first
       const { error: imageDeleteError } = await supabase
         .from('project_images')
         .delete()
@@ -223,10 +208,8 @@ const ProyectosAdmin = () => {
       
       if (imageDeleteError) {
         console.error('Error deleting images:', imageDeleteError);
-        // Continue with project deletion even if image deletion fails
       }
       
-      // Then delete the project
       const { error: projectDeleteError } = await supabase
         .from('projects')
         .delete()

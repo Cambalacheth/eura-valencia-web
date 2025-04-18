@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, VALID_PROJECT_CATEGORIES } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
@@ -39,9 +38,6 @@ interface ProjectFormProps {
   onImagesChange?: (images: ProjectImage[]) => void;
 }
 
-// Definimos las categorías exactamente como están en la base de datos
-const VALID_CATEGORIES = ['viviendas', 'reformas', 'comunidades'];
-
 const ProjectForm = ({
   project,
   onSubmit,
@@ -49,7 +45,7 @@ const ProjectForm = ({
   onImagesChange
 }: ProjectFormProps) => {
   const [title, setTitle] = useState(project?.title || '');
-  const [category, setCategory] = useState(project?.category || VALID_CATEGORIES[0]);
+  const [category, setCategory] = useState(project?.category || VALID_PROJECT_CATEGORIES[0]);
   const [location, setLocation] = useState(project?.location || '');
   const [projectDesc, setProjectDesc] = useState(project?.project || '');
   const [construction, setConstruction] = useState(project?.construction || '');
@@ -58,10 +54,8 @@ const ProjectForm = ({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   
-  // Generate a temporary ID for new projects to use with image uploads
   const [tempProjectId] = useState(`temp-${Math.random().toString(36).substr(2, 9)}`);
 
-  // Fetch images when editing an existing project
   useEffect(() => {
     if (project) {
       const fetchImages = async () => {
@@ -97,8 +91,7 @@ const ProjectForm = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validar que la categoría sea una de las permitidas
-    if (!VALID_CATEGORIES.includes(category)) {
+    if (!VALID_PROJECT_CATEGORIES.includes(category as any)) {
       toast({
         title: 'Error',
         description: 'Categoría no válida. Seleccione una de las opciones disponibles.',
@@ -107,7 +100,6 @@ const ProjectForm = ({
       return;
     }
     
-    // If this is a new project and we have temporary images, pass them along
     if (!project && projectImages.length > 0) {
       onSubmit({
         title,
@@ -133,9 +125,6 @@ const ProjectForm = ({
     setProjectImages(images);
     if (onImagesChange) onImagesChange(images);
   };
-  
-  // Debug para verificar el valor de la categoría
-  console.log('Current category value:', category);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -162,7 +151,7 @@ const ProjectForm = ({
               <SelectValue placeholder="Selecciona una categoría" />
             </SelectTrigger>
             <SelectContent>
-              {VALID_CATEGORIES.map((cat) => (
+              {VALID_PROJECT_CATEGORIES.map((cat) => (
                 <SelectItem key={cat} value={cat}>
                   {cat === 'viviendas' ? 'Viviendas' : 
                    cat === 'reformas' ? 'Reformas' : 
