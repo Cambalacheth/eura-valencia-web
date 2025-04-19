@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase, VALID_PROJECT_CATEGORIES } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -253,4 +252,3 @@ const ProjectForm = ({
 };
 
 export default ProjectForm;
-

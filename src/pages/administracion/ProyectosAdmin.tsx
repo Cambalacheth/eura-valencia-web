@@ -176,6 +176,38 @@ const ProyectosAdmin = () => {
       
       if (error) throw error;
       
+      if (projectImages[currentProject.id]) {
+        const { error: deleteError } = await supabase
+          .from('project_images')
+          .delete()
+          .eq('project_id', currentProject.id);
+        
+        if (deleteError) {
+          console.error('Error deleting old images:', deleteError);
+        }
+
+        if (projectImages[currentProject.id].length > 0) {
+          const { error: imageError } = await supabase
+            .from('project_images')
+            .insert(
+              projectImages[currentProject.id].map(img => ({
+                project_id: currentProject.id,
+                image_url: img.image_url,
+                is_cover: img.is_cover
+              }))
+            );
+          
+          if (imageError) {
+            console.error('Error saving images:', imageError);
+            toast({
+              title: 'Advertencia',
+              description: 'Proyecto actualizado, pero hubo un problema al guardar algunas imágenes',
+              variant: 'destructive',
+            });
+          }
+        }
+      }
+      
       setProjects((prev) => 
         prev.map((p) => (p.id === currentProject.id ? data : p))
       );
