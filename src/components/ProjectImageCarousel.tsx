@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Maximize, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -116,14 +115,38 @@ const ProjectImageCarousel = ({ images, title }: ProjectImageCarouselProps) => {
 
       {/* Fullscreen image viewer */}
       {fullScreenMode && (
-        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center" onClick={() => setFullScreenMode(false)}>
-          <div className="relative w-full h-full" onClick={e => e.stopPropagation()}>
-            <img 
-              src={images[currentImageIndex].image_url} 
-              alt={`${title} - Imagen a pantalla completa`}
-              className="max-w-full max-h-full m-auto object-contain"
-            />
-            
+        <div 
+          className="fixed inset-0 z-50 bg-black flex items-center justify-center touch-pan-y" 
+          onClick={() => setFullScreenMode(false)}
+        >
+          <div 
+            className="relative w-full h-full" 
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-full h-full flex items-center">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {images.map((image, index) => (
+                    <CarouselItem key={image.id}>
+                      <div className="flex items-center justify-center h-screen p-4">
+                        <img 
+                          src={image.image_url} 
+                          alt={`${title} - Imagen ${index + 1}`}
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {images.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-4" />
+                    <CarouselNext className="right-4" />
+                  </>
+                )}
+              </Carousel>
+            </div>
+
             <Button 
               variant="outline" 
               size="icon" 
@@ -132,29 +155,11 @@ const ProjectImageCarousel = ({ images, title }: ProjectImageCarouselProps) => {
             >
               <X className="h-6 w-6" />
             </Button>
-            
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-4">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className="bg-black/50 hover:bg-black/70 border-none text-white"
-                onClick={prevImage}
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-              
+
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center">
               <span className="text-white bg-black/50 px-4 py-2 rounded-md">
                 {currentImageIndex + 1} / {images.length}
               </span>
-              
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className="bg-black/50 hover:bg-black/70 border-none text-white"
-                onClick={nextImage}
-              >
-                <ChevronRight className="h-6 w-6" />
-              </Button>
             </div>
           </div>
         </div>

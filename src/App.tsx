@@ -21,6 +21,8 @@ import ProyectosAdmin from "./pages/administracion/ProyectosAdmin";
 import NoticiasAdmin from "./pages/administracion/NoticiasAdmin";
 import NotFound from "./pages/NotFound";
 import NoticiaDetalle from "./pages/NoticiaDetalle";
+import TerminosCondiciones from "./pages/TerminosCondiciones";
+import PoliticaPrivacidad from "./pages/PoliticaPrivacidad";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,8 @@ const App = () => (
             <Route path="/administracion" element={<Administracion />} />
             <Route path="/administracion/proyectos" element={<ProyectosAdmin />} />
             <Route path="/administracion/noticias" element={<NoticiasAdmin />} />
+            <Route path="/terminos-condiciones" element={<TerminosCondiciones />} />
+            <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
