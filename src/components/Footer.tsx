@@ -3,11 +3,15 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-gray-50 p-8">
+    <footer className="w-full bg-[#2C2C2C] p-8">
       <div className="container mx-auto flex justify-between">
         <div className="space-y-4">
-          <img src="/lovable-uploads/21fe1855-316c-48f6-885e-5f108adbbf33.png" alt="EURA" className="h-12" />
-          <div className="space-y-2">
+          <img 
+            src="/lovable-uploads/34e3d519-9ea5-46a9-82e1-2630b4a035dc.png" 
+            alt="EURA" 
+            className="h-16 w-auto" 
+          />
+          <div className="space-y-2 text-white">
             <p>C/ Maximiliano Thous 41,1º</p>
             <p>Valencia, España</p>
             <p>963 688 323</p>

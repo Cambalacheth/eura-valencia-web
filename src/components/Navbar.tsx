@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Instagram, Settings } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -8,7 +9,11 @@ const Navbar = () => {
   return (
     <nav className="w-full px-6 py-4 flex items-center justify-between">
       <Link to="/" className="text-2xl">
-        <img src="/lovable-uploads/db449622-5d1b-4948-bd31-36b83f3697ac.png" alt="eura" className="h-12" />
+        <img 
+          src="/lovable-uploads/f17724bb-500f-4cd5-8bf7-15246401a395.png" 
+          alt="eura" 
+          className="h-16 w-auto" 
+        />
       </Link>
       <div className="flex items-center gap-8">
         <Link to="/" className="hover:underline underline-offset-8 decoration-2">Inicio</Link>
