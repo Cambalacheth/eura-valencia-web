@@ -1,4 +1,3 @@
-
 import Layout from '../components/Layout';
 import Hero from '../components/Hero';
 import About from '../components/About';
@@ -53,9 +52,9 @@ const Index = () => {
           ))}
         </div>
       </div>
-      <div className="bg-gray-50 py-12">
+      <div className="bg-[#404c54] py-12">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-light text-center mb-12">SERVICIOS</h2>
+          <h2 className="text-3xl font-light text-center mb-12 text-white">SERVICIOS</h2>
           <ServicesGrid />
         </div>
       </div>

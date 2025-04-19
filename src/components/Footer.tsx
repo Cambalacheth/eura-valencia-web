@@ -3,7 +3,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-[#2C2C2C] p-8">
+    <footer className="w-full bg-[#404c54] p-8">
       <div className="container mx-auto flex justify-between">
         <div className="space-y-4">
           <img 
