@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -25,7 +24,7 @@ const ProjectImageUpload = ({
   images, 
   onImagesChange, 
   isNewProject = false,
-  maxImages = 5 
+  maxImages = 28 
 }: ProjectImageUploadProps) => {
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
@@ -33,8 +32,11 @@ const ProjectImageUpload = ({
   const handleImageUpload = async (files: FileList | null) => {
     if (!files || files.length === 0 || images.length >= maxImages) return;
 
+    const remainingSlots = maxImages - images.length;
+    const filesToUpload = Array.from(files).slice(0, remainingSlots);
+
     try {
-      const uploaders = Array.from(files).map(async (file) => {
+      const uploaders = filesToUpload.map(async (file) => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const filePath = `projects/${fileName}`;
@@ -74,10 +76,34 @@ const ProjectImageUpload = ({
     }
   };
 
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    handleImageUpload(e.dataTransfer.files);
+  }, [handleImageUpload]);
+
   const handleDeleteImage = (imageId: string) => {
     const updatedImages = images.filter(img => img.id !== imageId);
     
-    // Automatically set a new cover if the current cover was deleted
     if (updatedImages.length > 0 && !updatedImages.some(img => img.is_cover)) {
       updatedImages[0].is_cover = true;
     }
@@ -95,8 +121,14 @@ const ProjectImageUpload = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div 
+      className="space-y-4"
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {images.map((image) => (
           <div key={image.id} className="relative group">
             <AspectRatio ratio={4/3}>
@@ -133,12 +165,12 @@ const ProjectImageUpload = ({
         ))}
         {images.length < maxImages && (
           <div 
-            className={`flex items-center justify-center aspect-[4/3] border-2 border-dashed rounded-lg ${isDragging ? 'border-primary bg-primary/10' : 'border-gray-300'}`}
+            className={`flex items-center justify-center aspect-[4/3] border-2 border-dashed rounded-lg transition-colors ${isDragging ? 'border-primary bg-primary/10' : 'border-gray-300'}`}
           >
             <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
               <Upload className="w-8 h-8 text-gray-400" />
-              <span className="mt-2 text-sm text-gray-500">
-                {`Agregar imagen (${images.length}/${maxImages})`}
+              <span className="mt-2 text-sm text-gray-500 text-center px-2">
+                {isDragging ? 'Suelta las imágenes aquí' : `Arrastra o haz clic para agregar imágenes (${images.length}/${maxImages})`}
               </span>
               <input
                 type="file"
