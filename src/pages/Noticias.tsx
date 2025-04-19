@@ -1,17 +1,17 @@
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import MDEditor from "@uiw/react-md-editor";
+import { ArrowRight } from 'lucide-react';
+import { Helmet } from 'react-helmet';
 
 interface News {
   id: string;
   title: string;
   formatted_content?: string;
   image_url?: string;
-  link_url?: string;
   published_at: string;
 }
 
@@ -29,7 +29,6 @@ const Noticias = () => {
           .order('published_at', { ascending: false });
         
         if (error) throw error;
-        
         setNews(data || []);
       } catch (error: any) {
         toast({
@@ -53,8 +52,24 @@ const Noticias = () => {
     });
   };
 
+  const getExcerpt = (content?: string) => {
+    if (!content) return '';
+    // Remove markdown syntax and get first 150 characters
+    const plainText = content.replace(/[#*`]/g, '');
+    return plainText.length > 150 ? `${plainText.slice(0, 150)}...` : plainText;
+  };
+
   return (
     <Layout>
+      <Helmet>
+        <title>Noticias y Actualizaciones - EURA</title>
+        <meta name="description" content="Mantente informado sobre las últimas noticias y actualizaciones de EURA, empresa líder en arquitectura y construcción en Valencia." />
+        <meta property="og:title" content="Noticias y Actualizaciones - EURA" />
+        <meta property="og:description" content="Últimas noticias y actualizaciones de EURA" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://eura.es/noticias" />
+      </Helmet>
+
       <div className="container mx-auto py-12 px-4">
         <h1 className="text-4xl font-light mb-12">Noticias y Actualizaciones</h1>
 
@@ -65,43 +80,30 @@ const Noticias = () => {
             No hay noticias disponibles en este momento.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="space-y-12">
             {news.map((item) => (
-              <Card key={item.id} className="h-full flex flex-col">
+              <article key={item.id} className="flex flex-col md:flex-row gap-8">
                 {item.image_url && (
-                  <div className="w-full h-48 overflow-hidden">
+                  <div className="md:w-1/3">
                     <img 
                       src={item.image_url} 
                       alt={item.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-64 object-cover rounded-lg"
                     />
                   </div>
                 )}
-                <CardHeader>
-                  <CardTitle>{item.title}</CardTitle>
-                  <CardDescription>{formatDate(item.published_at)}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <div data-color-mode="light">
-                    <MDEditor.Markdown 
-                      source={item.formatted_content} 
-                      style={{ backgroundColor: 'transparent', padding: 0 }} 
-                    />
-                  </div>
-                </CardContent>
-                {item.link_url && (
-                  <CardFooter>
-                    <a 
-                      href={item.link_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-blue-600 hover:underline"
-                    >
-                      Ver más
-                    </a>
-                  </CardFooter>
-                )}
-              </Card>
+                <div className="md:w-2/3">
+                  <h2 className="text-2xl font-light mb-2">{item.title}</h2>
+                  <p className="text-gray-600 mb-4">{formatDate(item.published_at)}</p>
+                  <p className="text-gray-700 mb-4">{getExcerpt(item.formatted_content)}</p>
+                  <Link 
+                    to={`/noticias/${item.id}`}
+                    className="text-blue-600 hover:text-blue-800 flex items-center gap-2 font-medium"
+                  >
+                    Ver más <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </article>
             ))}
           </div>
         )}
