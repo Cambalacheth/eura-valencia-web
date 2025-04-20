@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Maximize, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
@@ -28,18 +27,22 @@ const ProjectImageCarousel = ({ images, title }: ProjectImageCarouselProps) => {
     setCurrentImageIndex(prev => (prev > 0 ? prev - 1 : images.length - 1));
   };
 
-  // Handle keyboard navigation in fullscreen mode
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!fullScreenMode) return;
-    
-    if (e.key === 'ArrowLeft') {
-      prevImage();
-    } else if (e.key === 'ArrowRight') {
-      nextImage();
-    } else if (e.key === 'Escape') {
-      setFullScreenMode(false);
-    }
-  };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!fullScreenMode) return;
+      
+      if (e.key === 'ArrowLeft') {
+        prevImage();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      } else if (e.key === 'Escape') {
+        setFullScreenMode(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [fullScreenMode]);
 
   if (images.length === 0) {
     return (
@@ -50,7 +53,7 @@ const ProjectImageCarousel = ({ images, title }: ProjectImageCarouselProps) => {
   }
 
   return (
-    <div className="w-full" onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className="w-full" tabIndex={0}>
       <Carousel className="w-full">
         <CarouselContent>
           {images.map((image, index) => (
@@ -117,42 +120,18 @@ const ProjectImageCarousel = ({ images, title }: ProjectImageCarouselProps) => {
       {/* Fullscreen image viewer */}
       {fullScreenMode && (
         <div 
-          className="fixed inset-0 z-50 bg-black flex items-center justify-center touch-pan-y" 
+          className="fixed inset-0 z-50 bg-black flex items-center justify-center" 
           onClick={() => setFullScreenMode(false)}
         >
           <div 
             className="relative w-full h-full" 
             onClick={e => e.stopPropagation()}
           >
-            <div className="w-full h-full flex items-center">
-              <Carousel 
-                className="w-full"
-                opts={{
-                  loop: true,
-                  startIndex: currentImageIndex,
-                }}
-              >
-                <CarouselContent>
-                  {images.map((image, index) => (
-                    <CarouselItem key={image.id}>
-                      <div className="flex items-center justify-center h-screen p-4">
-                        <img 
-                          src={image.image_url} 
-                          alt={`${title} - Imagen ${index + 1}`}
-                          className="max-w-full max-h-full object-contain"
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                {images.length > 1 && (
-                  <>
-                    <CarouselPrevious className="left-4" />
-                    <CarouselNext className="right-4" />
-                  </>
-                )}
-              </Carousel>
-            </div>
+            <img
+              src={images[currentImageIndex].image_url}
+              alt={`${title} - Imagen ${currentImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            />
 
             <Button 
               variant="outline" 
@@ -161,6 +140,24 @@ const ProjectImageCarousel = ({ images, title }: ProjectImageCarouselProps) => {
               onClick={() => setFullScreenMode(false)}
             >
               <X className="h-6 w-6" />
+            </Button>
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 border-none text-white"
+              onClick={prevImage}
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 border-none text-white"
+              onClick={nextImage}
+            >
+              <ChevronRight className="h-6 w-6" />
             </Button>
 
             <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center">

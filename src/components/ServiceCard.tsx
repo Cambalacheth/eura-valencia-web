@@ -7,19 +7,19 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ title, description, image }: ServiceCardProps) => {
   return (
-    <div className="group relative overflow-hidden mx-auto max-w-md rounded-lg shadow-lg">
-      <div className="relative h-[400px] md:h-[300px]">
+    <div className="group relative mx-auto max-w-md">
+      <div className="relative h-[300px]">
         <img
           src={image}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover rounded-t-lg"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-black/50 transition-all duration-500 flex items-center p-8">
-          <div className="text-white">
-            <h3 className="mb-4 text-2xl font-semibold leading-tight tracking-tight">{title}</h3>
-            <p className="text-base leading-relaxed opacity-100">{description}</p>
-          </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/70 flex items-end p-6">
+          <h3 className="text-2xl font-semibold text-white tracking-tight">{title}</h3>
         </div>
+      </div>
+      <div className="bg-white shadow-lg rounded-b-lg p-6">
+        <p className="text-gray-700 leading-relaxed">{description}</p>
       </div>
     </div>
   );

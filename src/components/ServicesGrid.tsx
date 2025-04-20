@@ -7,13 +7,12 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import ServiceCard from './ServiceCard';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 const services = [
   {
     title: "Obra nueva de viviendas unifamiliares",
     description: "Diseñamos y construimos hogares únicos, funcionales y sostenibles, adaptados a tu estilo de vida y necesidades.",
-    image: "/lovable-uploads/5aa295e0-5d63-4b25-86a1-1275a29b8d0b.png"
+    image: "/lovable-uploads/b55232a4-3d6e-4398-8125-00c60d8f0c98.png"
   },
   {
     title: "Redacción de proyectos, gestión de licencias y subvenciones",
@@ -23,12 +22,12 @@ const services = [
   {
     title: "Reformas integrales",
     description: "Transformamos fachadas y eliminamos barreras arquitectónicas, mejorando la accesibilidad y estética de tu edificio, todo con un enfoque en la modernización y el respeto por su esencia.",
-    image: "/lovable-uploads/ab938959-4860-462b-b782-3cbadb271c17.png"
+    image: "/lovable-uploads/5aa295e0-5d63-4b25-86a1-1275a29b8d0b.png"
   },
   {
     title: "Rehabilitación de edificios",
     description: "Damos nueva vida a edificaciones antiguas, mejorando su eficiencia, seguridad y confort sin perder su esencia.",
-    image: "/lovable-uploads/b55232a4-3d6e-4398-8125-00c60d8f0c98.png"
+    image: "/lovable-uploads/ab938959-4860-462b-b782-3cbadb271c17.png"
   },
   {
     title: "Trabajos verticales",
@@ -38,25 +37,24 @@ const services = [
 ];
 
 const ServicesGrid = () => {
-  const isMobile = useIsMobile();
-
   return (
     <Carousel 
       opts={{
-        align: "start",
-        slidesToScroll: isMobile ? 1 : 3,
-        loop: true, // Make the carousel cyclic
+        align: "center",
+        loop: true,
       }}
-      className="w-full max-w-5xl mx-auto"
+      className="w-full max-w-4xl mx-auto"
     >
-      <CarouselContent className="-ml-4">
+      <CarouselContent>
         {services.map((service, index) => (
-          <CarouselItem key={index} className={`pl-4 ${isMobile ? 'basis-full' : 'basis-1/3'}`}>
-            <ServiceCard
-              title={service.title}
-              description={service.description}
-              image={service.image}
-            />
+          <CarouselItem key={index} className="basis-full">
+            <div className="p-1">
+              <ServiceCard
+                title={service.title}
+                description={service.description}
+                image={service.image}
+              />
+            </div>
           </CarouselItem>
         ))}
       </CarouselContent>
