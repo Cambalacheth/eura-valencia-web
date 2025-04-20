@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Maximize, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -124,7 +125,13 @@ const ProjectImageCarousel = ({ images, title }: ProjectImageCarouselProps) => {
             onClick={e => e.stopPropagation()}
           >
             <div className="w-full h-full flex items-center">
-              <Carousel className="w-full">
+              <Carousel 
+                className="w-full"
+                opts={{
+                  loop: true,
+                  startIndex: currentImageIndex,
+                }}
+              >
                 <CarouselContent>
                   {images.map((image, index) => (
                     <CarouselItem key={image.id}>

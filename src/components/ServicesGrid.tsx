@@ -3,8 +3,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
   CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
 import ServiceCard from './ServiceCard';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -45,6 +45,7 @@ const ServicesGrid = () => {
       opts={{
         align: "start",
         slidesToScroll: isMobile ? 1 : 3,
+        loop: true, // Make the carousel cyclic
       }}
       className="w-full max-w-5xl mx-auto"
     >
