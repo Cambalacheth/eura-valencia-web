@@ -7,6 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import ServiceCard from './ServiceCard';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const services = [
   {
@@ -37,17 +38,19 @@ const services = [
 ];
 
 const ServicesGrid = () => {
+  const isMobile = useIsMobile();
+
   return (
     <Carousel 
       opts={{
         align: "start",
-        slidesToScroll: 3,
+        slidesToScroll: isMobile ? 1 : 3,
       }}
       className="w-full max-w-5xl mx-auto"
     >
       <CarouselContent className="-ml-4">
         {services.map((service, index) => (
-          <CarouselItem key={index} className="basis-1/3 pl-4">
+          <CarouselItem key={index} className={`pl-4 ${isMobile ? 'basis-full' : 'basis-1/3'}`}>
             <ServiceCard
               title={service.title}
               description={service.description}
