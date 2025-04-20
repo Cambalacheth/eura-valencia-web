@@ -14,10 +14,10 @@ const ServiceCard = ({ title, description, image }: ServiceCardProps) => {
           alt={title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-black/60 transition-all duration-500 flex items-center p-6">
+        <div className="absolute inset-0 bg-black/70 transition-all duration-500 flex items-center p-6">
           <div className="text-white">
-            <h3 className="mb-4 text-xl font-light leading-tight">{title}</h3>
-            <p className="text-sm leading-relaxed opacity-90">{description}</p>
+            <h3 className="mb-4 text-xl font-semibold leading-tight">{title}</h3>
+            <p className="text-sm leading-relaxed opacity-100">{description}</p>
           </div>
         </div>
       </div>
