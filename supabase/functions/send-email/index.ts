@@ -13,7 +13,6 @@ interface ContactFormData {
   fullName: string;
   email: string;
   phone: string;
-  projectType: string;
   message: string;
 }
 
@@ -35,7 +34,6 @@ const handler = async (req: Request): Promise<Response> => {
         <p><strong>Nombre:</strong> ${formData.fullName}</p>
         <p><strong>Email:</strong> ${formData.email}</p>
         <p><strong>Teléfono:</strong> ${formData.phone}</p>
-        <p><strong>Tipo de proyecto:</strong> ${formData.projectType}</p>
         <p><strong>Mensaje:</strong></p>
         <p>${formData.message}</p>
       `,
