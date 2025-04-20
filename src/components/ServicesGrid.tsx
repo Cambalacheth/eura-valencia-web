@@ -1,4 +1,5 @@
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Carousel,
   CarouselContent,
@@ -37,29 +38,36 @@ const services = [
 ];
 
 const ServicesGrid = () => {
+  const isMobile = useIsMobile();
+
   return (
     <Carousel 
       opts={{
-        align: "center",
+        align: "start",
         loop: true,
+        slidesToScroll: 1,
+        containScroll: "trimSnaps"
       }}
-      className="w-full max-w-4xl mx-auto"
+      className="w-full max-w-7xl mx-auto"
     >
-      <CarouselContent>
+      <CarouselContent className="-ml-2 md:-ml-4">
         {services.map((service, index) => (
-          <CarouselItem key={index} className="basis-full">
-            <div className="p-1">
-              <ServiceCard
-                title={service.title}
-                description={service.description}
-                image={service.image}
-              />
-            </div>
+          <CarouselItem 
+            key={index} 
+            className="pl-2 md:pl-4 basis-full md:basis-1/3"
+          >
+            <ServiceCard
+              title={service.title}
+              description={service.description}
+              image={service.image}
+            />
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="left-2" />
-      <CarouselNext className="right-2" />
+      <div className="hidden md:block">
+        <CarouselPrevious className="-left-12" />
+        <CarouselNext className="-right-12" />
+      </div>
     </Carousel>
   );
 };
