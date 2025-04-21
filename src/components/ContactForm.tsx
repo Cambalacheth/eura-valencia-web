@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -18,6 +19,8 @@ const formSchema = z.object({
 
 const ContactForm = () => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,13 +33,26 @@ const ContactForm = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const response = await fetch("/api/send-email", {
+      setIsSubmitting(true);
+      console.log("Sending form data:", values);
+      
+      // URL completa de la función Edge de Supabase
+      const response = await fetch("https://pmczckzukrwrgmjkeahv.functions.supabase.co/send-email", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtY3pja3p1a3J3cmdtamtlYWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDIxMTEsImV4cCI6MjA2MDU3ODExMX0.Cz8ZwU-ECkJUmQw0gKNghvqd5RGp_-8AmmzpsRF2yGs"}`
+        },
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) throw new Error("Error al enviar el mensaje");
+      console.log("Response status:", response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        throw new Error(errorData.error || "Error al enviar el mensaje");
+      }
 
       toast({
         title: "Mensaje enviado",
@@ -44,12 +60,15 @@ const ContactForm = () => {
       });
       
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "No se pudo enviar el mensaje. Por favor, inténtalo de nuevo.",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -123,8 +142,9 @@ const ContactForm = () => {
           )}
         />
 
-        <Button type="submit" className="w-full" size="lg">
-          <Send className="mr-2 h-4 w-4" /> Enviar mensaje
+        <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+          <Send className="mr-2 h-4 w-4" /> 
+          {isSubmitting ? "Enviando..." : "Enviar mensaje"}
         </Button>
       </form>
     </Form>
