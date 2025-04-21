@@ -37,10 +37,18 @@ const ContactForm = () => {
       setIsSubmitting(true);
       console.log("Sending form data:", values);
       
+      // Map form field names to match the database column names
+      const dbValues = {
+        full_name: values.fullName,
+        email: values.email,
+        phone: values.phone,
+        message: values.message,
+      };
+      
       // Insert the message into Supabase
       const { error } = await supabase
         .from('contact_messages')
-        .insert([values]);
+        .insert([dbValues]);
 
       if (error) {
         console.error("Error submitting to Supabase:", error);
