@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -36,23 +37,28 @@ const ContactForm = () => {
       setIsSubmitting(true);
       console.log("Sending form data:", values);
       
-      // URL completa de la función Edge de Supabase
+      // Insert the message into Supabase
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([values]);
+
+      if (error) {
+        console.error("Error submitting to Supabase:", error);
+        throw new Error(error.message);
+      }
+
+      // Also send notification via edge function
       const response = await fetch("https://pmczckzukrwrgmjkeahv.functions.supabase.co/send-email", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          // Use the API key directly without process.env
           "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtY3pja3p1a3J3cmdtamtlYWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDIxMTEsImV4cCI6MjA2MDU3ODExMX0.Cz8ZwU-ECkJUmQw0gKNghvqd5RGp_-8AmmzpsRF2yGs`
         },
         body: JSON.stringify(values),
       });
 
-      console.log("Response status:", response.status);
-      
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error response:", errorData);
-        throw new Error(errorData.error || "Error al enviar el mensaje");
+        console.log("Email notification failed but message was saved");
       }
 
       toast({
