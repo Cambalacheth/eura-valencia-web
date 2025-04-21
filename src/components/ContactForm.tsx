@@ -41,7 +41,8 @@ const ContactForm = () => {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtY3pja3p1a3J3cmdtamtlYWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDIxMTEsImV4cCI6MjA2MDU3ODExMX0.Cz8ZwU-ECkJUmQw0gKNghvqd5RGp_-8AmmzpsRF2yGs"}`
+          // Use the API key directly without process.env
+          "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtY3pja3p1a3J3cmdtamtlYWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDIxMTEsImV4cCI6MjA2MDU3ODExMX0.Cz8ZwU-ECkJUmQw0gKNghvqd5RGp_-8AmmzpsRF2yGs`
         },
         body: JSON.stringify(values),
       });
