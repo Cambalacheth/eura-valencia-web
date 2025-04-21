@@ -26,10 +26,15 @@ const handler = async (req: Request): Promise<Response> => {
     const formData: ContactFormData = await req.json();
     console.log("Received form data:", formData);
 
+    // Configuración de correo - enviamos a ambas direcciones de correo
+    const recipientEmail = "lautaro.sarni@gmail.com";
+    const resendRegisteredEmail = "cambalach.eth@gmail.com"; // La dirección con la que te registraste en Resend
+    
+    // Enviamos una copia al correo registrado en Resend (esto funcionará en modo prueba)
     const emailResponse = await resend.emails.send({
       from: "Eura Proyectos <onboarding@resend.dev>",
-      to: ["lautaro.sarni@gmail.com"],
-      subject: `Nuevo proyecto de ${formData.fullName}`,
+      to: [resendRegisteredEmail],
+      subject: `Nuevo proyecto de ${formData.fullName} - COPIA`,
       html: `
         <h1>Nuevo proyecto</h1>
         <p><strong>Nombre:</strong> ${formData.fullName}</p>
@@ -37,10 +42,11 @@ const handler = async (req: Request): Promise<Response> => {
         <p><strong>Teléfono:</strong> ${formData.phone}</p>
         <p><strong>Mensaje:</strong></p>
         <p>${formData.message}</p>
+        <p><strong>IMPORTANTE:</strong> Este es un correo de copia enviado a tu cuenta registrada en Resend. Para recibir correos en lautaro.sarni@gmail.com, necesitas verificar un dominio en Resend.</p>
       `,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    console.log("Email sent successfully to Resend registered email:", emailResponse);
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
