@@ -11,7 +11,7 @@ import ServiceCard from './ServiceCard';
 
 const services = [
   {
-    title: "Reformas",
+    title: "Reformas integrales",
     description: "Transformamos fachadas y eliminamos barreras arquitectónicas, mejorando la accesibilidad y estética de tu edificio, todo con un enfoque en la modernización y el respeto por su esencia.",
     image: "/lovable-uploads/cd4348a8-ae94-463b-aa14-98b1fa681e57.png"
   },
