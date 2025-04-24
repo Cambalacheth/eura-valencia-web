@@ -10,7 +10,7 @@ const Navbar = () => {
     <nav className="w-full px-6 py-4 flex items-center justify-between">
       <Link to="/" className="text-2xl">
         <img 
-          src="/lovable-uploads/f17724bb-500f-4cd5-8bf7-15246401a395.png" 
+          src="/lovable-uploads/72b976a5-0cbd-4c0b-8ec3-a9abaa3dd999.png" 
           alt="eura" 
           className="h-16 w-auto" 
         />

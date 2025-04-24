@@ -11,9 +11,9 @@ import ServiceCard from './ServiceCard';
 
 const services = [
   {
-    title: "Obra nueva de viviendas unifamiliares",
-    description: "Diseñamos y construimos hogares únicos, funcionales y sostenibles, adaptados a tu estilo de vida y necesidades.",
-    image: "/lovable-uploads/b55232a4-3d6e-4398-8125-00c60d8f0c98.png"
+    title: "Reformas",
+    description: "Transformamos fachadas y eliminamos barreras arquitectónicas, mejorando la accesibilidad y estética de tu edificio, todo con un enfoque en la modernización y el respeto por su esencia.",
+    image: "/lovable-uploads/cd4348a8-ae94-463b-aa14-98b1fa681e57.png"
   },
   {
     title: "Redacción de proyectos, gestión de licencias y subvenciones",
@@ -21,14 +21,14 @@ const services = [
     image: "/lovable-uploads/89e57273-5fe8-4f67-8f22-05bc18f2d04d.png"
   },
   {
-    title: "Reformas integrales",
-    description: "Transformamos fachadas y eliminamos barreras arquitectónicas, mejorando la accesibilidad y estética de tu edificio, todo con un enfoque en la modernización y el respeto por su esencia.",
-    image: "/lovable-uploads/5aa295e0-5d63-4b25-86a1-1275a29b8d0b.png"
-  },
-  {
     title: "Rehabilitación de edificios",
     description: "Damos nueva vida a edificaciones antiguas, mejorando su eficiencia, seguridad y confort sin perder su esencia.",
-    image: "/lovable-uploads/ab938959-4860-462b-b782-3cbadb271c17.png"
+    image: "/lovable-uploads/02784e71-22c7-42c3-bcc0-025e4024caa0.png"
+  },
+  {
+    title: "Obra nueva de viviendas unifamiliares",
+    description: "Diseñamos y construimos hogares únicos, funcionales y sostenibles, adaptados a tu estilo de vida y necesidades.",
+    image: "/lovable-uploads/f13378db-5915-4a5a-afdb-76fc3c6ffaa4.png"
   },
   {
     title: "Trabajos verticales",
