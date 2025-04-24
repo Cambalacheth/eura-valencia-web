@@ -23,9 +23,10 @@ const Proyectos = () => {
 
   return (
     <Layout>
-      <div className="w-full min-h-screen py-8">
+      <div className="w-full min-h-screen py-12">
         <div className="container mx-auto px-4 xl:px-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
+          <h1 className="text-4xl md:text-5xl font-light mb-12 text-center">Proyectos</h1>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 xl:gap-12">
             {projects.map((project, index) => (
               <div key={index} className="h-full">
                 <ProjectCard
