@@ -53,11 +53,11 @@ const ProjectCard = ({ title, image, link, category }: ProjectCardProps) => {
       <HoverCardTrigger asChild>
         <Link to={link} className="block w-full h-full group">
           <div className="relative overflow-hidden rounded-xl h-full shadow-lg transform transition-all duration-300 hover:scale-[1.02]">
-            <AspectRatio ratio={4/3}>
+            <AspectRatio ratio={16/9}>
               <div className="relative w-full h-full">
                 <img src={image} alt={title} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-all duration-300 group-hover:bg-black/40">
-                  <h3 className="text-white text-2xl md:text-3xl lg:text-4xl font-light text-center px-8">{title}</h3>
+                  <h3 className="text-white text-3xl md:text-4xl lg:text-5xl font-light text-center px-8">{title}</h3>
                 </div>
               </div>
             </AspectRatio>
@@ -65,15 +65,15 @@ const ProjectCard = ({ title, image, link, category }: ProjectCardProps) => {
         </Link>
       </HoverCardTrigger>
       {subProjects && subProjects.length > 0 && (
-        <HoverCardContent className="w-80 p-0">
-          <div className="grid gap-2">
+        <HoverCardContent className="w-[90%] p-4 bg-white/90 backdrop-blur-sm">
+          <div className="grid grid-cols-3 gap-2">
             {subProjects.map((subProject: SubProject) => (
               <Link 
                 key={subProject.id} 
                 to={`${link}/${subProject.id}`}
                 className="block group relative overflow-hidden rounded-lg"
               >
-                <AspectRatio ratio={16/9}>
+                <AspectRatio ratio={1}>
                   <div className="relative w-full h-full">
                     <img 
                       src={subProject.image_url || '/placeholder.svg'} 
@@ -81,7 +81,7 @@ const ProjectCard = ({ title, image, link, category }: ProjectCardProps) => {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-all duration-300 group-hover:bg-black/50">
-                      <h4 className="text-white text-lg font-light text-center px-4">{subProject.title}</h4>
+                      <h4 className="text-white text-sm font-light text-center px-2">{subProject.title}</h4>
                     </div>
                   </div>
                 </AspectRatio>
