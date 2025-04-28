@@ -29,9 +29,9 @@ const Proyectos = () => {
       <div className="w-full min-h-screen py-16">
         <div className="container mx-auto px-4 xl:px-8">
           <h1 className="text-5xl md:text-6xl font-light mb-16 text-center">Proyectos</h1>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 xl:gap-12">
             {projects.map((project, index) => (
-              <div key={index} className="h-full">
+              <div key={index} className="h-full transform transition-all duration-300 hover:scale-[1.02]">
                 <ProjectCard
                   title={project.title}
                   image={project.image}

@@ -52,12 +52,12 @@ const ProjectCard = ({ title, image, link, category }: ProjectCardProps) => {
     <HoverCard>
       <HoverCardTrigger asChild>
         <Link to={link} className="block w-full h-full group">
-          <div className="relative overflow-hidden rounded-xl h-full shadow-lg transform transition-all duration-300 hover:scale-[1.02]">
-            <AspectRatio ratio={16/9}>
+          <div className="relative overflow-hidden rounded-xl h-full shadow-xl">
+            <AspectRatio ratio={4/3}>
               <div className="relative w-full h-full">
                 <img src={image} alt={title} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-all duration-300 group-hover:bg-black/40">
-                  <h3 className="text-white text-3xl md:text-4xl lg:text-5xl font-light text-center px-8">{title}</h3>
+                  <h3 className="text-white text-2xl md:text-3xl xl:text-4xl font-light text-center px-8 leading-tight">{title}</h3>
                 </div>
               </div>
             </AspectRatio>
