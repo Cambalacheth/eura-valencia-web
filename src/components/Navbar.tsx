@@ -1,19 +1,13 @@
-
 import { Link } from 'react-router-dom';
 import { Instagram, Settings } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-
 const Navbar = () => {
-  const { isAdmin } = useAuth();
-
-  return (
-    <nav className="w-full px-6 py-4 flex items-center justify-between">
+  const {
+    isAdmin
+  } = useAuth();
+  return <nav className="w-full px-6 py-4 flex items-center justify-between">
       <Link to="/" className="text-2xl">
-        <img 
-          src="/lovable-uploads/8772377d-a872-4f15-8280-8c9c075ca1f7.png" 
-          alt="eura" 
-          className="h-16 w-auto" 
-        />
+        <img alt="eura" className="h-16 w-auto" src="/lovable-uploads/1bdac85e-b3c5-481b-906f-f7eb1c23fc1c.jpg" />
       </Link>
       <div className="flex items-center gap-8">
         <Link to="/" className="hover:underline underline-offset-8 decoration-2">Inicio</Link>
@@ -22,20 +16,16 @@ const Navbar = () => {
         <Link to="/servicios" className="hover:underline underline-offset-8 decoration-2">Servicios</Link>
         <Link to="/noticias" className="hover:underline underline-offset-8 decoration-2">Noticias</Link>
         <Link to="/contacto" className="hover:underline underline-offset-8 decoration-2">Contacto</Link>
-        {isAdmin && (
-          <>
+        {isAdmin && <>
             <Link to="/administracion" className="flex items-center gap-1 hover:underline underline-offset-8 decoration-2">
               <Settings className="w-4 h-4" />
               Administración
             </Link>
-          </>
-        )}
+          </>}
         <a href="https://www.instagram.com/euraproyectosobrasyservicios" target="_blank" rel="noopener noreferrer">
           <Instagram className="w-5 h-5" />
         </a>
       </div>
-    </nav>
-  );
+    </nav>;
 };
-
 export default Navbar;
