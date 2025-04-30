@@ -48,7 +48,7 @@ const ServicesGrid = () => {
         slidesToScroll: 1,
         containScroll: "trimSnaps"
       }}
-      className="w-full max-w-7xl mx-auto"
+      className="w-full max-w-7xl mx-auto relative"
     >
       <CarouselContent className="-ml-2 md:-ml-4">
         {services.map((service, index) => (
@@ -65,8 +65,8 @@ const ServicesGrid = () => {
         ))}
       </CarouselContent>
       <div className="hidden md:block">
-        <CarouselPrevious className="-left-12" />
-        <CarouselNext className="-right-12" />
+        <CarouselPrevious className="-left-16 h-12 w-12 shadow-lg hover:bg-primary hover:text-white transition-colors" />
+        <CarouselNext className="-right-16 h-12 w-12 shadow-lg hover:bg-primary hover:text-white transition-colors" />
       </div>
     </Carousel>
   );
