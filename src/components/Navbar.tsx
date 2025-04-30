@@ -9,7 +9,7 @@ const Navbar = () => {
   } = useAuth();
   return <nav className="w-full px-6 py-4 flex items-center justify-between">
       <Link to="/" className="text-2xl">
-        <img alt="eura" className="h-16 w-auto" src="/lovable-uploads/21fd1714-91da-4af1-bb7f-440b05b4ac40.png" />
+        <img alt="eura" className="h-16 w-auto" src="/lovable-uploads/8b4788f4-19d5-405e-880f-9d1a967b75d4.png" />
       </Link>
       <div className="flex items-center gap-8">
         <Link to="/" className="hover:underline underline-offset-8 decoration-2">Inicio</Link>
