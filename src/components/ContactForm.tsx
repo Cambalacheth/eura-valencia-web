@@ -1,3 +1,4 @@
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -54,7 +55,9 @@ const ContactForm = () => {
         throw new Error(dbError.message);
       }
 
-      // Try to send email notification via edge function, but don't block on failure
+      console.log("Message saved to database successfully");
+
+      // Try to send email notification via edge function
       try {
         const response = await fetch("https://pmczckzukrwrgmjkeahv.functions.supabase.co/send-email", {
           method: "POST",
@@ -66,7 +69,11 @@ const ContactForm = () => {
         });
 
         if (!response.ok) {
-          console.log("Email notification failed but message was saved");
+          const errorData = await response.json();
+          console.error("Email API responded with error:", errorData);
+          console.log("However, message was saved to database");
+        } else {
+          console.log("Email sent successfully");
         }
       } catch (emailError) {
         console.error("Email sending error (but form was saved):", emailError);
