@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -53,6 +54,7 @@ const Footer = () => {
             </a>
           </div>
         </div>
+        {/* Enlaces ocultos temporalmente
         <div className="mt-8 pt-4 border-t border-gray-600">
           <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-300">
             <Link to="/terminos-condiciones" className="hover:underline">
@@ -63,6 +65,7 @@ const Footer = () => {
             </Link>
           </div>
         </div>
+        */}
       </div>
     </footer>
   );
