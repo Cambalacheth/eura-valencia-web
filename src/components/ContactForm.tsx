@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -46,32 +45,37 @@ const ContactForm = () => {
       };
       
       // Insert the message into Supabase
-      const { error } = await supabase
+      const { error: dbError } = await supabase
         .from('contact_messages')
         .insert([dbValues]);
 
-      if (error) {
-        console.error("Error submitting to Supabase:", error);
-        throw new Error(error.message);
+      if (dbError) {
+        console.error("Error submitting to Supabase:", dbError);
+        throw new Error(dbError.message);
       }
 
-      // Also send notification via edge function
-      const response = await fetch("https://pmczckzukrwrgmjkeahv.functions.supabase.co/send-email", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtY3pja3p1a3J3cmdtamtlYWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDIxMTEsImV4cCI6MjA2MDU3ODExMX0.Cz8ZwU-ECkJUmQw0gKNghvqd5RGp_-8AmmzpsRF2yGs`
-        },
-        body: JSON.stringify(values),
-      });
+      // Try to send email notification via edge function, but don't block on failure
+      try {
+        const response = await fetch("https://pmczckzukrwrgmjkeahv.functions.supabase.co/send-email", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtY3pja3p1a3J3cmdtamtlYWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDIxMTEsImV4cCI6MjA2MDU3ODExMX0.Cz8ZwU-ECkJUmQw0gKNghvqd5RGp_-8AmmzpsRF2yGs`
+          },
+          body: JSON.stringify(values),
+        });
 
-      if (!response.ok) {
-        console.log("Email notification failed but message was saved");
+        if (!response.ok) {
+          console.log("Email notification failed but message was saved");
+        }
+      } catch (emailError) {
+        console.error("Email sending error (but form was saved):", emailError);
+        // Continue with success message since the database entry was successful
       }
 
       toast({
         title: "Mensaje enviado",
-        description: "Nos pondremos en contacto contigo pronto.",
+        description: "Hemos recibido tu mensaje. Nos pondremos en contacto contigo pronto.",
       });
       
       form.reset();
