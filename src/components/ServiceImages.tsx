@@ -1,5 +1,8 @@
 
+import { useIsMobile } from "@/hooks/use-mobile";
+
 const ServiceImages = () => {
+  const isMobile = useIsMobile();
   const images = [
     "/lovable-uploads/cc71ac42-bf0e-49d0-8bd2-a401cad228e9.png",
     "/lovable-uploads/f90b8ed1-f94d-4064-a81d-d5904caa73b2.png",
@@ -9,15 +12,16 @@ const ServiceImages = () => {
   ];
 
   return (
-    <div className="bg-gray-600 py-12">
+    <div className="bg-gray-600 py-8 md:py-12">
       <div className="container mx-auto">
-        <div className="flex justify-center gap-4 overflow-x-auto px-4">
+        <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory px-4 scrollbar-hide">
           {images.map((src, index) => (
             <img
               key={index}
               src={src}
               alt={`Servicio ${index + 1}`}
-              className="w-64 h-64 object-cover"
+              className="w-48 h-48 md:w-64 md:h-64 object-cover flex-shrink-0 snap-center rounded-md"
+              loading="lazy"
             />
           ))}
         </div>

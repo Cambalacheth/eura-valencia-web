@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Instagram } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-[#404c54] p-8">
+    <footer className="w-full bg-[#404c54] p-6 md:p-8">
       <div className="container mx-auto">
-        <div className="flex flex-col md:flex-row justify-between">
+        <div className="flex flex-col md:flex-row justify-between gap-8">
           <div className="space-y-4">
             <img 
               src="/lovable-uploads/34e3d519-9ea5-46a9-82e1-2630b4a035dc.png" 
@@ -16,7 +17,7 @@ const Footer = () => {
             <div className="space-y-2 text-white">
               <p>C/ Maximiliano Thous 41,1º</p>
               <p>Valencia, España</p>
-              <p>
+              <p className="flex items-center">
                 <a 
                   href="tel:+34963688323" 
                   className="hover:underline"
@@ -24,7 +25,7 @@ const Footer = () => {
                   +34 963 688 323
                 </a>
               </p>
-              <p>
+              <p className="flex items-center">
                 <a 
                   href="mailto:mail@eura.es" 
                   className="hover:underline"
@@ -33,9 +34,20 @@ const Footer = () => {
                   mail@eura.es
                 </a>
               </p>
+              <div className="md:hidden flex items-center gap-2 pt-2">
+                <a 
+                  href="https://www.instagram.com/euraproyectosobrasyservicios" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-white"
+                >
+                  <Instagram className="w-5 h-5" />
+                  <span>Síguenos en Instagram</span>
+                </a>
+              </div>
             </div>
           </div>
-          <div className="w-full md:w-1/2 h-64 mt-8 md:mt-0">
+          <div className="w-full md:w-1/2 h-48 md:h-64">
             <a 
               href="https://maps.app.goo.gl/cYw3i3gGZSg39er76" 
               target="_blank" 
