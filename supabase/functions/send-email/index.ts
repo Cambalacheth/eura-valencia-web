@@ -2,8 +2,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
-// Initialize Resend with the API key
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+// Initialize Resend with the new API key
+const resend = new Resend(Deno.env.get("RESEND_API_KEY") || "re_huaniPLt_PHSe37FptwRhZvZmd8vTvPUf");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailResponse = await resend.emails.send({
       from: "Eura Proyectos <onboarding@resend.dev>",
-      to: ["cambalach.eth@gmail.com"],
+      to: ["mail@eura.es"],
       subject: `Nuevo mensaje de contacto de ${formData.fullName}`,
       html: `
         <h1>Nuevo mensaje de contacto</h1>
