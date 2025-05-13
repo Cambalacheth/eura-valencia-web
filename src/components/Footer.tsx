@@ -28,6 +28,7 @@ const Footer = () => {
                 <a 
                   href="mailto:mail@eura.es" 
                   className="hover:underline"
+                  translate="no" // Prevents translation of email address
                 >
                   mail@eura.es
                 </a>
